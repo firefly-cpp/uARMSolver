@@ -6,7 +6,10 @@
 
 ## Run example
 
-    ./bin/uARMSolver
+    ./bin/uARMSolver arm.set
+
+arm.set is a problem definition file. Check [README](bin/README.txt)
+ for more details about the format of .set file.
 
 ## Reference Papers (software is based on ideas from):
 
