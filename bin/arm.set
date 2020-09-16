@@ -9,11 +9,11 @@
 % Problem definition
 Problem 
 {        
-Tdbase_name = datasets/Abalone.csv
+Tdbase_name = ../datasets/Abalone.csv
 %Tdbase_name = datasets/rangeN
-Rule_name = rules/range
+Rule_name = ../rules/range
 %Out_name = out/rangeN
-Out_name = out/Abalone.txt
+Out_name = ../out/Abalone.txt
 Period = 1
 %Intervals = 5
 }
