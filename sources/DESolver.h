@@ -13,6 +13,7 @@
 #define _DESOLVER_H
 
 #include <vector>
+#include <random>
 
 #include "Archive.h"
 #include "Archive.h"
@@ -68,7 +69,7 @@ public:
 	int Generations(void) { return(generations); }
 
 protected:
-	void SelectSamples(int candidate,int *r1,int *r2=0,int *r3=0, int *r4=0,int *r5=0);
+	void SelectSamples(vector<int> &r);
 	double RandomUniform(double min,double max);
 
 	int D;
@@ -84,13 +85,19 @@ protected:
 
 	StrategyFunction calcTrialSolution;	///< selected DE mutation strategy
 
-	vector<double> trialSolution;		///< trial solution
+	vector<Rule> generationRules;
+	vector<double> trialEnergies;
+	vector<vector<double> > trialSolutions;
+	//vector<double> trialSolution;		///< trial solution
 	vector<double> bestSolution;		///< the best solution found
 	vector<double> popEnergy;			///< fitness function values of the particular vector within population
 	vector<vector <double>> population;	///< the current population of individuals
 
 	Problem prob;		///< problem definition
 	Evaluate eval;		///< evaluation of a fitness function
+	default_random_engine generator;
+    uniform_real_distribution<double> distributionUni;
+    uniform_int_distribution<int> distributionPop;
 
 private:
 	void Best1Exp(int candidate);

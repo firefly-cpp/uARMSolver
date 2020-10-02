@@ -18,14 +18,23 @@ DESolver::DESolver(int dim,int popSize,	Problem problem) :
 					D(dim), nDim(0), nPop(popSize),
 					generations(0), strategy(stRand1Exp),
 					scale(0.7), probability(0.5),
-					trialEnergy(0.0), bestEnergy(0.0),
+					bestEnergy(0.0),
 					calcTrialSolution(NULL)
 {
+	
+
+	trialSolutions = vector<vector<double> >(nPop);
+	trialEnergies = vector<double>(nPop);
+	generationRules = vector<Rule>(nPop);
+	distributionUni = uniform_real_distribution<double>(0.0, 1.0);
+	distributionPop = uniform_int_distribution<int>(0, popSize-1);
+
 	prob = problem;
 	nDim = eval.encode(D, prob);
 
 	for(int i=0;i<nDim;i++) {
-		trialSolution.push_back(0.0);
+		for (int k=0;k<nPop;k++)
+			trialSolutions.at(k).push_back(0.0);
 		bestSolution.push_back(0.0);
 	}
 	for(int i=0;i<nPop;i++) {
@@ -48,7 +57,7 @@ DESolver::DESolver(int dim,int popSize,	Problem problem) :
  */
 DESolver::~DESolver(void)
 {
-	trialSolution.clear();
+	trialSolutions.clear();
 	bestSolution.clear();
 	popEnergy.clear();
 	population.clear();
@@ -73,7 +82,7 @@ void DESolver::Setup(int deStrategy, double diffScale, double crossoverProb)
 	for (i=0; i < nPop; i++)
 	{
 		for (int j=0; j < nDim; j++)
-			population[i][j] = RandomUniform(0.0,1.0);
+			population[i][j] = distributionUni(generator);
 
 		popEnergy[i] = 0;
 	}
@@ -144,23 +153,26 @@ void DESolver::Evolve(int run, int maxFEs, Archive &rules)
 
 	for (int generation=0;generation < maxGenerations;generation++) {
 cout << "generation= " << generation << endl;
+		#pragma omp parallel for
 		for (int candidate=0; candidate < nPop; candidate++)
 		{
-			Rule rule;
 			(this->*calcTrialSolution)(candidate);
-			trialEnergy = eval.EnergyFunction(trialSolution, prob, rule);
-			if (trialEnergy > popEnergy[candidate])
+			trialEnergies.at(candidate) = eval.EnergyFunction(trialSolutions.at(candidate), prob, generationRules.at(candidate));
+		}
+		for (int candidate=0; candidate < nPop; candidate++)
+		{
+			if (trialEnergies.at(candidate) > popEnergy[candidate])
 			{
 				// New low for this candidate
-				popEnergy[candidate] = trialEnergy;
-				population[candidate] = trialSolution;
-				rules.add(rule);
+				popEnergy[candidate] = trialEnergies.at(candidate);
+				population[candidate] = trialSolutions.at(candidate);
+				rules.add(generationRules.at(candidate));
 
 				// Check if all-time low
-				if (trialEnergy > bestEnergy)
+				if (trialEnergies.at(candidate) > bestEnergy)
 				{
-					bestEnergy = trialEnergy;
-					bestSolution = trialSolution;
+					bestEnergy = trialEnergies.at(candidate);
+					bestSolution = trialSolutions.at(candidate);
 cout << "bestFitness= " << bestEnergy << " at " << generation << " generation." << endl;
 				}
 			}
@@ -178,16 +190,15 @@ cout << "bestFitness= " << bestEnergy << " at " << generation << " generation." 
  */
 void DESolver::Best1Exp(int candidate)
 {
-	int r1, r2;
 	int n;
+	vector<int> r = {candidate,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	SelectSamples(candidate,&r1,&r2);
-	n = (int)RandomUniform(0.0,(double)nDim);
-
-	trialSolution = population[candidate];
-	for (int i=0; (RandomUniform(0.0,1.0) < probability) && (i < nDim); i++) 
+	trialSolutions.at(candidate) = population[candidate];
+	for (int i=0; (distributionUni(generator) < probability) && (i < nDim); i++) 
 	{
-		trialSolution[n] = bestSolution[n] + scale * (population[r1][n] - population[r2][n]);
+		trialSolutions.at(candidate)[n] = bestSolution[n] + scale * (population[r.at(1)][n] - population[r.at(2)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -202,16 +213,15 @@ void DESolver::Best1Exp(int candidate)
  */
 void DESolver::Rand1Exp(int candidate)
 {
-	int r1, r2, r3;
 	int n;
+	vector<int> r = {candidate,0,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	SelectSamples(candidate,&r1,&r2,&r3);
-	n = (int)RandomUniform(0.0,(double)nDim);
-
-	trialSolution = population[candidate];
-	for (int i=0; (RandomUniform(0.0,1.0) < probability) && (i < nDim); i++) 
+	trialSolutions.at(candidate) = population[candidate];
+	for (int i=0; (distributionUni(generator) < probability) && (i < nDim); i++) 
 	{
-		trialSolution[n] = population[r1][n] + scale * (population[r2][n] - population[r3][n]);
+		trialSolutions.at(candidate)[n] = population[r.at(1)][n] + scale * (population[r.at(2)][n] - population[r.at(3)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -226,16 +236,16 @@ void DESolver::Rand1Exp(int candidate)
  */
 void DESolver::RandToBest1Exp(int candidate)
 {
-	int r1, r2;
 	int n;
 
-	SelectSamples(candidate,&r1,&r2);
-	n = (int)RandomUniform(0.0,(double)nDim);
+	vector<int> r = {candidate,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	trialSolution = population[candidate];
-	for (int i=0; (RandomUniform(0.0,1.0) < probability) && (i < nDim); i++) 
+	trialSolutions.at(candidate) = population[candidate];
+	for (int i=0; (distributionUni(generator) < probability) && (i < nDim); i++) 
 	{
-		trialSolution[n] += scale * (bestSolution[n] - trialSolution[n]) + scale * (population[r1][n] - population[r2][n]);
+		trialSolutions.at(candidate)[n] += scale * (bestSolution[n] - trialSolutions.at(candidate)[n]) + scale * (population[r.at(1)][n] - population[r.at(2)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -250,16 +260,16 @@ void DESolver::RandToBest1Exp(int candidate)
  */
 void DESolver::Best2Exp(int candidate)
 {
-	int r1, r2, r3, r4;
 	int n;
 
-	SelectSamples(candidate,&r1,&r2,&r3,&r4);
-	n = (int)RandomUniform(0.0,(double)nDim);
+	vector<int> r = {candidate,0,0,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	trialSolution = population[candidate];
-	for (int i=0; (RandomUniform(0.0,1.0) < probability) && (i < nDim); i++) 
+	trialSolutions.at(candidate) = population[candidate];
+	for (int i=0; (distributionUni(generator) < probability) && (i < nDim); i++) 
 	{
-		trialSolution[n] = bestSolution[n] + scale * (population[r1][n] + population[r2][n] - population[r3][n] - population[r4][n]);
+		trialSolutions.at(candidate)[n] = bestSolution[n] + scale * (population[r.at(1)][n] + population[r.at(2)][n] - population[r.at(3)][n] - population[r.at(4)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -274,16 +284,16 @@ void DESolver::Best2Exp(int candidate)
  */
 void DESolver::Rand2Exp(int candidate)
 {
-	int r1, r2, r3, r4, r5;
 	int n;
 
-	SelectSamples(candidate,&r1,&r2,&r3,&r4,&r5);
-	n = (int)RandomUniform(0.0,(double)nDim);
+	vector<int> r = {candidate,0,0,0,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	trialSolution = population[candidate];
-	for (int i=0; (RandomUniform(0.0,1.0) < probability) && (i < nDim); i++) 
+	trialSolutions.at(candidate) = population[candidate];
+	for (int i=0; (distributionUni(generator) < probability) && (i < nDim); i++) 
 	{
-		trialSolution[n] = population[r1][n] + scale * (population[r2][n] + population[r3][n] - population[r4][n] - population[r5][n]);
+		trialSolutions.at(candidate)[n] = population[r.at(1)][n] + scale * (population[r.at(2)][n] + population[r.at(3)][n] - population[r.at(4)][n] - population[r.at(5)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -298,17 +308,17 @@ void DESolver::Rand2Exp(int candidate)
  */
 void DESolver::Best1Bin(int candidate)
 {
-	int r1, r2;
 	int n;
 
-	SelectSamples(candidate,&r1,&r2);
-	n = (int)RandomUniform(0.0,(double)nDim);
+	vector<int> r = {candidate,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	trialSolution = population[candidate];
+	trialSolutions.at(candidate) = population[candidate];
 	for (int i=0; i < nDim; i++) 
 	{
-		if ((RandomUniform(0.0,1.0) < probability) || (i == (nDim - 1)))
-			trialSolution[n] = bestSolution[n] + scale * (population[r1][n] - population[r2][n]);
+		if ((distributionUni(generator) < probability) || (i == (nDim - 1)))
+			trialSolutions.at(candidate)[n] = bestSolution[n] + scale * (population[r.at(1)][n] - population[r.at(2)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -323,21 +333,21 @@ void DESolver::Best1Bin(int candidate)
  */
 void DESolver::Rand1Bin(int candidate)
 {
-	int r1, r2, r3;
 	int n;
 
-	SelectSamples(candidate,&r1,&r2,&r3);
-	n = (int)RandomUniform(0.0,(double)nDim);
+	vector<int> r = {candidate,0,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	trialSolution = population[candidate];
+	trialSolutions.at(candidate) = population[candidate];
 	for (int i=0; i < nDim; i++) 
 	{
-		if ((RandomUniform(0.0,1.0) < probability) || (i  == (nDim - 1))) {
-			trialSolution[n] = population[r1][n] + scale * (population[r2][n] - population[r3][n]);
-			if(trialSolution[n] < 0.0)
-				trialSolution[n] = 0.0;
-			if(trialSolution[n] > 1.0)
-				trialSolution[n] = 1.0;
+		if ((distributionUni(generator) < probability) || (i  == (nDim - 1))) {
+			trialSolutions.at(candidate)[n] = population[r.at(1)][n] + scale * (population[r.at(2)][n] - population[r.at(3)][n]);
+			if(trialSolutions.at(candidate)[n] < 0.0)
+				trialSolutions.at(candidate)[n] = 0.0;
+			if(trialSolutions.at(candidate)[n] > 1.0)
+				trialSolutions.at(candidate)[n] = 1.0;
 		}
 		n = (n + 1) % nDim;
 	}
@@ -353,17 +363,17 @@ void DESolver::Rand1Bin(int candidate)
  */
 void DESolver::RandToBest1Bin(int candidate)
 {
-	int r1, r2;
 	int n;
 
-	SelectSamples(candidate,&r1,&r2);
-	n = (int)RandomUniform(0.0,(double)nDim);
+	vector<int> r = {candidate,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	trialSolution = population[candidate];
+	trialSolutions.at(candidate) = population[candidate];
 	for (int i=0; i < nDim; i++) 
 	{
-		if ((RandomUniform(0.0,1.0) < probability) || (i  == (nDim - 1)))
-			trialSolution[n] += scale * (bestSolution[n] - trialSolution[n]) + scale * (population[r1][n] - population[r2][n]);
+		if ((distributionUni(generator) < probability) || (i  == (nDim - 1)))
+			trialSolutions.at(candidate)[n] += scale * (bestSolution[n] - trialSolutions.at(candidate)[n]) + scale * (population[r.at(1)][n] - population[r.at(2)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -378,17 +388,17 @@ void DESolver::RandToBest1Bin(int candidate)
  */
 void DESolver::Best2Bin(int candidate)
 {
-	int r1, r2, r3, r4;
 	int n;
 
-	SelectSamples(candidate,&r1,&r2,&r3,&r4);
-	n = (int)RandomUniform(0.0,(double)nDim);
+	vector<int> r = {candidate,0,0,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	trialSolution = population[candidate];
+	trialSolutions.at(candidate) = population[candidate];
 	for (int i=0; i < nDim; i++) 
 	{
-		if ((RandomUniform(0.0,1.0) < probability) || (i  == (nDim - 1)))
-			trialSolution[n] = bestSolution[n] + scale * (population[r1][n] + population[r2][n] - population[r3][n] - population[r4][n]);
+		if ((distributionUni(generator) < probability) || (i  == (nDim - 1)))
+			trialSolutions.at(candidate)[n] = bestSolution[n] + scale * (population[r.at(1)][n] + population[r.at(2)][n] - population[r.at(3)][n] - population[r.at(4)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -403,17 +413,17 @@ void DESolver::Best2Bin(int candidate)
  */
 void DESolver::Rand2Bin(int candidate)
 {
-	int r1, r2, r3, r4, r5;
 	int n;
 
-	SelectSamples(candidate,&r1,&r2,&r3,&r4,&r5);
-	n = (int)RandomUniform(0.0,(double)nDim);
+	vector<int> r = {candidate,0,0,0,0,0};
+	SelectSamples(r);
+	n = distributionPop(generator);
 
-	trialSolution = population[candidate];
+	trialSolutions.at(candidate) = population[candidate];
 	for (int i=0; i < nDim; i++) 
 	{
-		if ((RandomUniform(0.0,1.0) < probability) || (i  == (nDim - 1)))
-			trialSolution[n] = population[r1][n] + scale * (population[r2][n] + population[r3][n] - population[r4][n] - population[r5][n]);
+		if ((distributionUni(generator) < probability) || (i  == (nDim - 1)))
+			trialSolutions.at(candidate)[n] = population[r.at(1)][n] + scale * (population[r.at(2)][n] + population[r.at(3)][n] - population[r.at(4)][n] - population[r.at(5)][n]);
 		n = (n + 1) % nDim;
 	}
 
@@ -423,58 +433,18 @@ void DESolver::Rand2Bin(int candidate)
 /**
  * Select candidate solutions entering into DE mutation strategies.
  *
- * @param an index of the target vectors together with references to randomly selected candidate indexes.
+ * @param r a vector of indexes where the first component must be equal to the the target vector.
  * @return up to five randomly selected indexes. If the alias of the index is not entered, index 0 is assumed.
  */
-void DESolver::SelectSamples(int candidate,int *r1,int *r2,
-										int *r3,int *r4,int *r5)
+void DESolver::SelectSamples(vector<int> &r)
 {
-	if (r1)
-	{
-		do
-		{
-			*r1 = (int)RandomUniform(0.0,(double)nPop);
-		}
-		while (*r1 == candidate);
+	int proposedIndex;
+	for (size_t k = 0; k < r.size(); k++) {
+		do {
+			proposedIndex = distributionPop(generator);
+		} while(find(r.begin(), r.begin()+k, proposedIndex)!=r.begin()+k);
+		r.at(k) = proposedIndex;
 	}
-
-	if (r2)
-	{
-		do
-		{
-			*r2 = (int)RandomUniform(0.0,(double)nPop);
-		}
-		while ((*r2 == candidate) || (*r2 == *r1));
-	}
-
-	if (r3)
-	{
-		do
-		{
-			*r3 = (int)RandomUniform(0.0,(double)nPop);
-		}
-		while ((*r3 == candidate) || (*r3 == *r2) || (*r3 == *r1));
-	}
-
-	if (r4)
-	{
-		do
-		{
-			*r4 = (int)RandomUniform(0.0,(double)nPop);
-		}
-		while ((*r4 == candidate) || (*r4 == *r3) || (*r4 == *r2) || (*r4 == *r1));
-	}
-
-	if (r5)
-	{
-		do
-		{
-			*r5 = (int)RandomUniform(0.0,(double)nPop);
-		}
-		while ((*r5 == candidate) || (*r5 == *r4) || (*r5 == *r3)
-													|| (*r5 == *r2) || (*r5 == *r1));
-	}
-
 	return;
 }
 
@@ -494,70 +464,3 @@ void DESolver::SelectSamples(int candidate,int *r1,int *r2,
 #define NDIV (1+IMM1/NTAB)
 #define EPS 1.2e-7
 #define RNMX (1.0-EPS)
-
-/**
- * Proprietary random number generator.
- *
- * @param minimum and maximum values determining the interval of feasible random numbers.
- * @return double return code: denoting the random number within the predefined interval.
- */
-double DESolver::RandomUniform(double minValue,double maxValue)
-{
-	long j;
-	long k;
-	static long idum;
-	static long idum2=123456789;
-	static long iy=0;
-	static long iv[NTAB];
-	double result;
-
-	if (iy == 0)
-		idum = SEED;
-
-	if (idum <= 0)
-	{
-		if (-idum < 1)
-			idum = 1;
-		else
-			idum = -idum;
-
-		idum2 = idum;
-
-		for (j=NTAB+7; j>=0; j--)
-		{
-			k = idum / IQ1;
-			idum = IA1 * (idum - k*IQ1) - k*IR1;
-			if (idum < 0) idum += IM1;
-			if (j < NTAB) iv[j] = idum;
-		}
-
-		iy = iv[0];
-	}
-
-	k = idum / IQ1;
-	idum = IA1 * (idum - k*IQ1) - k*IR1;
-
-	if (idum < 0)
-		idum += IM1;
-
-	k = idum2 / IQ2;
-	idum2 = IA2 * (idum2 - k*IQ2) - k*IR2;
-
-	if (idum2 < 0)
-		idum2 += IM2;
-
-	j = iy / NDIV;
-	iy = iv[j] - idum2;
-	iv[j] = idum;
-
-	if (iy < 1)
-		iy += IMM1;
-
-	result = AM * iy;
-
-	if (result > RNMX)
-		result = RNMX;
-
-	result = minValue + result * (maxValue - minValue);
-	return(result);
-}

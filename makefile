@@ -12,13 +12,13 @@ all:	bin/uARMSolver
 
 bin/uARMSolver:	$(OBJS)
 	@echo 'Invoking: GCC C++ Linker'
-	$(CC) -o $@ $^ 
+	$(CC) -fopenmp -o $@ $^ 
 	@echo 'Finished building: $<'
 	rm -fr $(OBJS) $(DEPS)
 
 %.o: ./sources/%.cpp 
 	@echo 'Invoking: GCC C++ Compiler'
-	$(CC) -I./sources -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	$(CC) -fopenmp -I./sources -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 
 clean:
