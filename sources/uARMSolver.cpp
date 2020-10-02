@@ -8,6 +8,9 @@
  * Created: July 2020
  * Last Modified: 11/9/20
  * Revision: 1.0
+ *
+ * Help function (add version number) - fixed at 2.10.2020 by Fister Iztok.
+ *
  */
 
 #include <stdio.h>
@@ -51,7 +54,7 @@ int main(int argc, char* argv[])
 	
     for(int i=1;i<argc;i++)
     {
-    	if((strncmp(argv[i], "-h", 2) == 0) || (strncmp(argv[i], "-?", 2) == 0))
+    	if((strncmp(argv[i], "-v", 2) == 0) || (strncmp(argv[i], "-?", 2) == 0))
     	{
     		help();
     		return 0;
@@ -140,8 +143,9 @@ int main(int argc, char* argv[])
  */
 void help()
 {
-	printf("Syntax:\n");
-	printf("  ARM [-h|-?] [-s'arm.set']\n");
+	printf("uARMSolver version 1.0 (October 2020)\n\n");	// fixed at 2.10.2020 by Fister Iztok
+	printf("Syntax\n");
+	printf("  uARMSolver [-v|-?] [-s'arm.set']\n");
 }
 
 /**

@@ -81,8 +81,9 @@ void Evaluate::decode(vector<double> x, vector<Feature> feat, Rule &rule)
 	rule.sort();
 	uint cp = x[x.size()-1]*(pointers.size()-2)+1;
 
-	if(cp == 1)
+	if(cp == 1) {
 		cp = pointers.size()/2+1;
+	}
 
 	for(uint i=0;i<pointers.size();i++) {
 		bool taken = false;
@@ -90,7 +91,9 @@ void Evaluate::decode(vector<double> x, vector<Feature> feat, Rule &rule)
 		string pair = feat[rule.perm[i]].f_name+"_";
 		if(feat[rule.perm[i]].type == ATTR_CATEGORICAL) {	// categorical attribute
 			if(random01() < x[ptr+2]) {
-				int val = x[ptr+1]*feat[rule.perm[i]].hash.size();
+				uint val = x[ptr+1]*feat[rule.perm[i]].hash.size();
+				if(val == feat[rule.perm[i]].hash.size())	// fixed at 2.10.2020 by Fister Iztok
+					val--;
 				pair.append(feat[rule.perm[i]].hash[val]);
 				taken = true;
 			}
