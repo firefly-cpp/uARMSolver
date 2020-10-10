@@ -5,7 +5,7 @@
 #include <math.h>
 #include <float.h>
 #include <cstring>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <algorithm>
 #include <fstream>
@@ -41,6 +41,7 @@ public:
 	bool check_item(vector<Feature> feat, string item);
 	int find_feat(vector<Feature> feat, string item);
 	void add(Rule rule);
+	void asort();
 
 	void print_tokens(vector<string>tokens);
 	void print();
@@ -48,5 +49,7 @@ public:
 public:
 	vector <Rule> arch;	///< Archive of mined association rules data structure.
 };
+
+bool compare(Rule one, Rule two);
 
 #endif /* ARCHIVE_H_ */

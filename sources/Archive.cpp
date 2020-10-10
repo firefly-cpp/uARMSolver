@@ -194,6 +194,23 @@ void Archive::add(Rule rule)
 	arch.push_back(rule);
 }
 
+/**
+ * Sort and an archive of mined association rules according to support.
+ *
+ * @param no parameters.
+ * @return no return code.
+ */
+void Archive::asort()
+{
+	sort(arch.begin(), arch.end(), compare);
+}
+
+bool compare(Rule a, Rule b)
+{
+	if(a.get_fitness() <= b.get_fitness())
+		return false;
+	return true;
+}
 void Archive::print_tokens(vector<string>tokens)
 {
 	cout << "Tokens printout:" << endl;

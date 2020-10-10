@@ -124,6 +124,7 @@ int main(int argc, char* argv[])
 			}
 			printf("Writing file= %d, f_name= %s...\n", i + 1, str.c_str());
 		    // write archive of rules found
+			rules[i].asort();	// sort the archive
 			rules[i].write(str, prob[i]);
 		}
 	}
