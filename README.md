@@ -33,4 +33,4 @@ This framework is provided as-is, and there are no guarantees that it fits your 
 
 ## Cite us
 
-Fister I., Fister I. Jr. uARMSolver: A framework for Association Rule Mining, Submitted to journal, 2020.
+I. Fister, I Fister Jr. uARMSolver: A framework for Association Rule Mining. arXiv preprint [arXiv:2010.10884](https://arxiv.org/abs/2010.10884), 2020.
