@@ -1,6 +1,9 @@
-CC=g++
-#CFLAGS = -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)"
-CFLAGS = -O0 -g3 -Wall 
+CXX=g++
+#CXXFLAGS = -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)"
+# If run as DEBUG=1 make, it adds these flags, otherwise it simply uses flags from the environment
+ifeq ($(DEBUG), 1)
+	CXXFLAGS := $(CXXFLAGS) -O0 -g3 -Wall -fmessage-length=0
+endif
 
 SRCS = ./sources/Archive.cpp ./sources/Attribute.cpp ./sources/DESolver.cpp ./sources/Evaluate.cpp ./sources/Feature.cpp ./sources/Problem.cpp ./sources/Rule.cpp ./sources/Setup.cpp ./sources/uARMSolver.cpp 
 
@@ -12,13 +15,13 @@ all:	bin/uARMSolver
 
 bin/uARMSolver:	$(OBJS)
 	@echo 'Invoking: GCC C++ Linker'
-	$(CC) -o $@ $^ 
+	$(CXX) $(LDFLAGS) -o $@ $^
 	@echo 'Finished building: $<'
 	rm -fr $(OBJS) $(DEPS)
 
 %.o: ./sources/%.cpp 
 	@echo 'Invoking: GCC C++ Compiler'
-	$(CC) -I./sources -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	$(CXX) -I./sources $(CXXFLAGS) -c -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 
 clean:
