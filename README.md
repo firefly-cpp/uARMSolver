@@ -15,6 +15,12 @@ To install uARMSolver on Fedora, use:
 ```sh
 $ dnf install uARMSolver
 ```
+To install uARMSolver on RHEL, CentOS, Scientific Linux enable EPEL 8 and use:
+
+```sh
+$ dnf install uARMSolver
+```
+
 
 ## Run example
 
