@@ -20,6 +20,7 @@ To install uARMSolver on RHEL, CentOS, Scientific Linux enable EPEL 8 and use:
 ```sh
 $ dnf install uARMSolver
 ```
+To install uARMSolver on Windows, please follow to the [following instructions](WINDOWS_INSTALLATION.md).
 
 
 ## Run example
