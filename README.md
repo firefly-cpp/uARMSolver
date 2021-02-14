@@ -25,7 +25,7 @@ To install uARMSolver on Windows, please follow to the [following instructions](
 
 ## Run example
 
-    ./bin/uARMSolver arm.set
+    ./uARMSolver arm.set
 
 arm.set is a problem definition file. Check [README](bin/README.txt)
  for more details about the format of .set file.
@@ -36,7 +36,8 @@ arm.set is a problem definition file. Check [README](bin/README.txt)
 
 [2] I. Fister Jr., I Fister. Information cartography in association rule mining. arXiv preprint [arXiv:2003.00348](https://arxiv.org/abs/2003.00348), 2020.
 
-[3]
+[3] I. Fister Jr., V. Podgorelec, I. Fister. Improved Nature-Inspired Algorithms for Numeric Association Rule Mining. In: Vasant P., Zelinka I., Weber GW. (eds) Intelligent Computing and Optimization. ICO 2020. Advances in Intelligent Systems and Computing, vol 1324. Springer, Cham.
+
 
 ## Contributors
 
