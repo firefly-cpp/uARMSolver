@@ -13,6 +13,7 @@
 #define _DESOLVER_H
 
 #include <vector>
+#include <random>
 
 #include "Archive.h"
 #include "Archive.h"
@@ -68,8 +69,11 @@ public:
 	int Generations(void) { return(generations); }
 
 protected:
-	void SelectSamples(int candidate,int *r1,int *r2=0,int *r3=0, int *r4=0,int *r5=0);
-	double RandomUniform(double min,double max);
+	void SelectSamples(vector<int> &neig);
+	default_random_engine randomEngine;
+	uniform_int_distribution<int> agentIdDist;
+	uniform_int_distribution<int> dimIdDist;
+	uniform_real_distribution<double> valueDist;
 
 	int D;
 	int nDim;
