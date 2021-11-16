@@ -61,8 +61,12 @@ int main(int argc, char* argv[])
     	}
     	if(strncmp(argv[i], "-s", 2) == 0)	// setup file name
     	{
-    		s_name = "";
-    		s_name.append(&argv[i][2]);
+		s_name.assign(&argv[i][2]);
+		// allow -s FILE, not just -sFILE:
+		if (s_name.empty() && i < argc - 1)
+		{
+			s_name.assign(argv[++i]);
+		}
     	}
     }
 
@@ -146,7 +150,7 @@ void help()
 {
 	printf("uARMSolver version 1.0 (October 2020)\n\n");	// fixed at 2.10.2020 by Fister Iztok
 	printf("Syntax\n");
-	printf("  uARMSolver [-v|-?] [-s'arm.set']\n");
+	printf("  uARMSolver [-v|-?] [-s'arm.set'|-s 'arm.set']\n");
 }
 
 /**
