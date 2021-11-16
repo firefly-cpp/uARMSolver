@@ -43,7 +43,7 @@ arm.set is a problem definition file. Check [README](bin/README.txt)
 
 Iztok Fister, Iztok Fister Jr.
 
-## Licence
+## License
 
 This package is distributed under the MIT License. This license can be found online at <http://www.opensource.org/licenses/MIT>.
 
