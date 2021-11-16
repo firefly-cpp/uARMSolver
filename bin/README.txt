@@ -28,7 +28,7 @@ where the transaction database is located,
 - 'Rule_name' = <file_name>: parameter <file_name> identifies a path,
 where the existing archive of mined association rules exists,
 - 'Out_name' = <file_name>: parameter <file_name> identifies a path,
-where the arhive of mined association rules needs to be stored,
+where the archive of mined association rules needs to be stored,
 - 'Period' = <integer_value>: parameter <integer_value> determines, how
 many periods are captured by particular archive files.
 
