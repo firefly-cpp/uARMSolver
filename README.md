@@ -25,7 +25,7 @@ To install uARMSolver on Windows, please follow to the [following instructions](
 
 ## Run example
 
-    ./uARMSolver arm.set
+    ./uARMSolver -sarm.set
 
 arm.set is a problem definition file. Check [README](bin/README.txt)
  for more details about the format of .set file.
