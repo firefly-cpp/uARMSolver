@@ -36,7 +36,7 @@
 #define CR 0.9
 
 
-	void help();
+	void help(FILE *stream = stdout);
 	void solve(Setup setup, Problem problem, Archive &rules);
 	void visualize(Setup setup, Archive rules);
 
@@ -57,9 +57,9 @@ int main(int argc, char* argv[])
     	if((strncmp(argv[i], "-v", 2) == 0) || (strncmp(argv[i], "-?", 2) == 0))
     	{
     		help();
-    		return 0;
+		return EXIT_SUCCESS;
     	}
-    	if(strncmp(argv[i], "-s", 2) == 0)	// setup file name
+	else if(strncmp(argv[i], "-s", 2) == 0)	// setup file name
     	{
 		s_name.assign(&argv[i][2]);
 		// allow -s FILE, not just -sFILE:
@@ -67,7 +67,11 @@ int main(int argc, char* argv[])
 		{
 			s_name.assign(argv[++i]);
 		}
-    	}
+	} else {
+		fprintf(stderr, "Unexpected argument: %s\n\n", argv[i]);
+		help(stderr);
+		return EXIT_FAILURE;
+	}
     }
 
     srand(1);
@@ -146,11 +150,11 @@ int main(int argc, char* argv[])
  * @param no parameters.
  * @return no return value.
  */
-void help()
+void help(FILE * stream)
 {
-	printf("uARMSolver version 1.0 (October 2020)\n\n");	// fixed at 2.10.2020 by Fister Iztok
-	printf("Syntax\n");
-	printf("  uARMSolver [-v|-?] [-s'arm.set'|-s 'arm.set']\n");
+	fprintf(stream, "uARMSolver version 1.0 (October 2020)\n\n");	// fixed at 2.10.2020 by Fister Iztok
+	fprintf(stream, "Syntax\n");
+	fprintf(stream, "  uARMSolver [-v|-?] [-s'arm.set'|-s 'arm.set']\n");
 }
 
 /**
