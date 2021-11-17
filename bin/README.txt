@@ -2,75 +2,99 @@
 % Setup file for ARM Version 1.0 README.txt file by Iztok Fister
 %
 % Created: 15/9/20
-% Last Modified: 16/9/20
-% Revision: 1.0
+% Last Modified: 16/11/21
+% Revision: 1.0.1
 % ***************************************************************
 
 README.txt describes how to configure a universal ARM Solver (uARMSolver)
 using a setup file. The setup file consists of three sections, including:
 
 - a problem definition,
-- parameter setting of a selected algorithm for solving ARM,
+- parameter setting of a selected algorithm for solving ARM, and
 - parameter setting of a selected visualization method.
 
-Let us mention that each line started with '%' character denotes a
-comment and consequently the corresponding lines are avoided from 
-syntax checking.
+Lines starting with the '%' character are comments and are not checked for
+syntax.
 
-Problem definition started with reserved word 'Problem', where a
-definitions of specific parameters follows between curly brackets. 
-Each line of parameter definition consists of three parts: parameter
-name, equal sign '=', and the assigned value. There are the following 
+The problem definition begins with the reserved word 'Problem', then
+curly brackets enclosing a series of parameter definitions. Each
+parameter definition is a line of the form:
+
+  <parameter> = <value>
+
+The following parameters are supported:
+
+  Tdbase_name = <file_name>
+    path of the transaction database
+  Rule_name = <file_name>
+    path of an existing archive of mined association rules
+  Out_name = <file_name>
+    path where the archive of mined association rules will be written
+  Period = <integer_value>
+    how many periods are captured by archive files
+
+The 'Period' parameter determines whether more transaction databases or
+archive files are processed by the solver simultaneously.  When its value
+is more than one, the solver expects that files are named with extensions
+according to their sequence numbers, e.g., .1, .2, ..., .k). When the
+'Period' is set to one, a single input file representing the transaction
+database or ARM archive is processed.
+
+A line of the form:
+
+  Algorithm = <mnemonic>
+
+selects a particular ARM solver algorithm. For example, the Differential
+Algorithm has mnemonic 'DE', Particle Swarm Optimization has mnemonic
+'PSO', and so on.
+
+When the algorithm is `NONE`, the solver does not perform optimization.
+Instead, it expects an ARM archive produced by another traditional
+algorithm (such as Apriori) and focuses on the visualization section of
+the process.
+
+Next are algorithm-specific parameter blocks. These begin with a line of
+the form
+
+  <mnemonic>_PARAM
+
+followed by curly brackets enclosing a series of parameter definitions of
+the form
+
+  <mnemonic>_<param> = <value>
+
+For example, the Differential Algorithm (DE) supports the following
 parameters:
 
-- 'Tdbase_name' = <file_name>: parameter <file_name> identifies a path, 
-where the transaction database is located,
-- 'Rule_name' = <file_name>: parameter <file_name> identifies a path,
-where the existing archive of mined association rules exists,
-- 'Out_name' = <file_name>: parameter <file_name> identifies a path,
-where the archive of mined association rules needs to be stored,
-- 'Period' = <integer_value>: parameter <integer_value> determines, how
-many periods are captured by particular archive files.
+  DE_NP = <integer_value>
+    population size of DE algorithm
+  DE_FES = <integer_value>
+    maximum number of fitness function evaluations
+  DE_RUNS = <integer_value>
+    maximum number of an independent DE runs
+  DE_F = <float_value>
+    scaling factor used by DE mutation strategy
+  DE_CR = <float_value>
+    crossover parameter controlling the DE mutation strategy
+  DE_STRATEGY = <integer_value in [1,12]>
+    specific DE mutation strategy
 
-Actually, the last parameter determines, if more transaction databases or 
-archive files are processed by the solver simultaneously. Indeed, when the
-value of the 'Period' parameter is more than one, the solver expect that
-an extension of each specific file is denotes as a sequence number (e.g.,
-.1, .2, ..., .k). In contrast, when the period is set to one, normally, 
-one input file representing the transaction database or ARM archive is
-processed.
+In the future, the solver will support a visualization method. A line of
+the form:
 
-The algorithm section is devoted for selecting a particular algorithm in
-role of ARM solver. The algorithm selection is realized through a token
-'Algorithm', which a mnemonic of the definite algorithm follows. For 
-instance, Differential Algorithm is selected using token <DE>, the Particle
-Swarm Optimization using token <PSO>, etc. Interestingly, there exists also
-selection <NONE> determining that no optimization algorithm is used. In this
-case, the solver expect ARM archive produced by the other traditional 
-algorithms (like Apriori), and focus itself on the visualization section
-of the process. 
+  Visualization = <mnemonic>
 
-After selecting the appropriate optimization algorithm, parameter setting
-determining its behavior follows. Each parameter setting starts with the
-mnemonic of the algorithm to which the word 'PARAM' is concatenated using
-a '_' character. Then, parameter setting follows enclosed between two
-curly brackets. For DE algorithm, we can specify the following parameters
-introduced in form of "'ALG_Parameter' = <Value>":
+selects a particular method of preparing the data from the ARM archive for
+visualization.
 
-- 'DE_NP' = <integer_value>: the population size of DE algorithm,
-- 'DE_FES' = <integer_value>: the maximum number of fitness function evaluations,
-- 'DE_RUNS' = <integer_value>: the maximum number of an independent DE runs,
-- 'DE_F' = <float_value>: the scaling factor used by DE mutation strategy,
-- 'DE_CR' = <float_value>: the crossover parameter controlling the DE mutation strategy,
-- 'DE_STRATEGY' = <integer_value in [1,12]>: the specific DE mutation strategy.
+Two algorithms are planned:
 
-Similarly, also parameters of the other optimization algorithms are specified.
+  FLOW
+    River flow
+  METRO
+    Metro map
 
-Although not implemented yet, the solver will support also visualization section,
-in which an appropriate visualization method is selected and the parameter setting
-of the selected method are determined. Actually, this section is devoted for 
-definition of the algorithm necessary for preparing data from the ARM archive that
-serve for visualization method. We plan to implement two algorithms for preparing
-River flov (token <FLOW>) and Metro map (token <METRO>) visualization methods that
-can be selected using reserved word 'Visualization'. If token <NONE> is selected,
-no visualization preparation is demanded.
+Method 'NONE' will disable visualization preparation.
+
+Visualization methods will have method-specific parameter blocks similar to the
+algorithm-specific parameter blocks for the ARM solver.

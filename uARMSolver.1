@@ -35,10 +35,10 @@ See the
 .B FILES
 section for details.
 .SH FILES
-.SS "SETUP FILE (PROBLEM DEFINITION FILE)"
 This section describes how to describes how to configure a universal ARM Solver
 .RB ( uARMSolver )
-using a setup file. See also the
+using a setup file.
+See also the
 .B \-s
 option.
 The setup file consists of three sections, including:
@@ -51,151 +51,136 @@ parameter setting of a selected algorithm for solving ARM, and
 parameter setting of a selected visualization method.
 .RE
 .P
-Let us mention that each line started with
+Lines starting with the
 .B %
-character denotes a comment
-and consequently the corresponding lines are avoided from syntax checking.
+character are comments and are not checked for syntax.
+.SS "PROBLEM DEFINITION"
 .P
-Problem definition started with reserved word
+The problem definition begins with the reserved word
 .BR Problem ,
-where a definitions of specific parameters
-follows between curly brackets. 
-Each line of parameter definition consists of three parts:
-parameter name, equal sign
-.BR = ,
-and the assigned value.
-There are the following parameters:
+then curly brackets enclosing a series of parameter definitions.
+Each parameter definition is a line of the form:
+.in +7n
+.EX
+.IB parameter \ =\  value
+.EE
+.in
+The following parameters are supported:
 .RS +7n
-.IP \(bu 2n
-.B Tdbase_name
-=
-.IR file_name :
-parameter
-.I file_name
-identifies a path, 
-where the transaction database is located,
-.IP \(bu 2n
-.B Rule_name
-=
-.IR file_name :
-parameter
-.I file_name
-identifies a path, 
-where the existing archive of mined association rules exists,
-.IP \(bu 2n
-.B Out_name
-=
-.IR file_name :
-parameter
-.I file_name
-identifies a path, 
-where the archive of mined association rules needs to be stored,
-.IP \(bu 2n
-.B Period
-=
-.IR integer_value :
-parameter
-.I integer_value
-determines, how many periods are captured by particular archive files.
+.TP
+.B Tdbase_name = \fIfile_name
+path of the transaction database
+.TP
+.B Rule_name = \fIfile_name
+path of an existing archive of mined association rules
+.TP
+.B Out_name = \fIfile_name
+path where the archive of mined association rules will be written
+.TP
+.B Period = \fIinteger_value
+how many periods are captured by archive files
 .RE
 .P
-Actually, the last parameter determines,
-if more transaction databases or archive files
-are processed by the solver simultaneously.
-Indeed, when the value of the
+The
 .B Period
-parameter is more than one,
-the solver expect that an extension of each specific file
+parameter determines whether more transaction databases or archive files
+are processed by the solver simultaneously.
+When its value is more than one, the solver expects that files are named
+with extensions according to their sequence numbers, e.g.,
 is denotes as a sequence number (e.g.,
 .BR .1 ,
 .BR .2 ,\ ...,
-.BR .k ).
-In contrast, when the period is set to one, normally, 
-one input file representing the transaction database or ARM archive
+.BR .k .
+When the
+.B Period
+is set to one, a single input file
+representing the transaction database or ARM archive
 is processed.
+.SS "ALGORITHM SELECTION"
 .P
-The algorithm section is devoted for selecting a particular algorithm
-in role of ARM solver.
-The algorithm selection is realized through a token
-.BR Algorithm,
-which a mnemonic of the definite algorithm follows.
-For instance,
-Differential Algorithm is selected using token
-.BR DE,
-the Particle Swarm Optimization using token
+A line of the form:
+.in +7n
+.EX
+.B Algorithm = \fImnemonic
+.EE
+.in
+selects a particular ARM solver algorithm.
+For example, the Differential Algorithm has mnemonic
+.BR DE ,
+Particle Swarm Optimization has mnemonic
 .BR PSO ,
-etc.
-Interestingly, there exists also selection
-.B NONE
-determining that no optimization algorithm is used.
-In this case, the solver expect ARM archive
-produced by the other traditional algorithms (like Apriori),
-and focus itself on the visualization section of the process. 
+and so on.
 .P
-After selecting the appropriate optimization algorithm,
-parameter setting determining its behavior follows.
-Each parameter setting starts with the mnemonic of the algorithm
-to which the word
-.B PARAM
-is concatenated using a
-.B _
-character.
-Then, parameter setting follows
-enclosed between two curly brackets.
-For
-.B DE
-algorithm, we can specify the following parameters
-introduced in form of
-.IB ALG _ Parameter \ =
-.IR Value :
+When the algorithm is
+.BR NONE ,
+the solver does not perform optimization.
+Instead, it expects an ARM archive produced by another traditional algorithm
+(such as Apriori) and focuses on the visualization section of the process.
+.SS "ALGORITHM-SPECIFIC PARAMETERS"
+.P
+Next are algorithm-specific parameter blocks.
+These begin with a line of the form
+.in +7n
+.EX
+.IB mnemonic _ PARAM
+.EE
+.in
+followed by curly brackets enclosing a series of parameter definitions of the
+form
+.in +7n
+.EX
+.IB mnemonic _ param \ =\  value
+.EE
+.in
+For example, the Differential Algorithm
+.RB ( DE )
+supports the following parameters:
 .RS +7n
-.IP \(bu 2n
-.BI DE_NP\ =
-.IR integer_value :
-the population size of DE algorithm,
-.IP \(bu 2n
-.BI DE_FES\ =
-.IR integer_value :
-the maximum number of fitness function evaluations,
-.IP \(bu 2n
-.BI DE_RUNS\ =
-.IR integer_value :
-the maximum number of an independent DE runs,
-.IP \(bu 2n
-.BI DE_F\ =
-.IR float_value :
-the scaling factor used by DE mutation strategy,
-.IP \(bu 2n
-.BI DE_CR\ =
-.IR float_value :
-the crossover parameter controlling the DE mutation strategy,
-.IP \(bu 2n
-.BI DE_STRATEGY\ =
-.I integer_value
-in
-.BR [1,12] :
-the specific DE mutation strategy.
+.TP
+.B DE_NP\ =\ \fIinteger_value
+population size of DE algorithm
+.TP
+.B DE_FES\ =\ \fIinteger_value
+maximum number of fitness function evaluations
+.TP
+.B DE_RUNS\ =\ \fIinteger_value
+maximum number of an independent DE runs
+.TP
+.B DE_F\ =\ \fIfloat_value
+scaling factor used by DE mutation strategy
+.TP
+.B DE_CR\ =\ \fIfloat_value
+crossover parameter controlling the DE mutation strategy
+.TP
+.B DE_STRATEGY\ =\ \fIinteger_value\fR in [1,12]
+specific DE mutation strategy
 .RE
+.SS "VISUALIZATION SELECTION"
 .P
-Similarly, also parameters of the other optimization algorithms are specified.
+In the future, the solver will support a visualization method.
+A line of the form:
+.in +7n
+.EX
+.B Visualization = \fImnemonic
+.EE
+.in
+selects a particular method of preparing the data from the ARM archive
+for visualization.
 .P
-Although not implemented yet,
-the solver will support also visualization section,
-in which an appropriate visualization method is selected
-and the parameter setting of the selected method are determined.
-Actually, this section is devoted for definition of the algorithm
-necessary for preparing data from the ARM archive
-that serve for visualization method.
-We plan to implement two algorithms for preparing
-River flov (token
-.BR FLOW )
-and Metro map (token
-.BR METRO )
-visualization methods that can be selected using reserved word
-.BR Visualization .
-If token
+Two algorithms are planned:
+.TP
+.B FLOW
+River flow
+.TP
+.B METRO
+Metro map
+.P
+Method
 .B NONE
-is selected, no visualization preparation is demanded.
+will disable visualization preparation.
+.SS "VISUALIZATION PARAMETERS"
+Visualization methods will have method-specific parameter blocks similar to the
+algorithm-specific parameter blocks for the ARM solver.
 .SH EXAMPLES
 .in +7x
 .EX
