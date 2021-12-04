@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img width="200" src=".github/uarm.png">
+  <img width="200" src=".github/uARM.png">
 </p>
 
 ## Description
