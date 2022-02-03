@@ -5,6 +5,8 @@
   <img width="200" src=".github/uARM.png">
 </p>
 
+[![AUR package](https://img.shields.io/aur/version/uarmsolver?color=blue&label=Arch%20Linux&logo=arch-linux)](https://aur.archlinux.org/packages/uarmsolver)
+
 ## Description
 
 The framework is written fully in C++ and runs on all platforms. It allows users to preprocess their data in a transaction database, to make discretization of data, to search for association rules and to guide a presentation/visualization of the best rules found using external tools. As opposed to the existing software packages or frameworks, this also supports numerical and real-valued types of attributes besides the categorical ones. Mining the association rules is defined as an optimization and solved using the nature-inspired algorithms that can be incorporated easily. Because the algorithms normally discover a huge amount of association rules, the framework enables a modular inclusion of so-called visual guiders for extracting the knowledge hidden in data, and visualize these using external tools.
@@ -24,6 +26,11 @@ To install uARMSolver on RHEL, CentOS, Scientific Linux enable EPEL 8 and use:
 
 ```sh
 $ dnf install uARMSolver
+```
+To install uARMSolver on [Arch-based distributions](https://wiki.archlinux.org/title/Arch-based_distributions#Active), please use an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers):
+
+```sh
+$ yay -Syyu uarmsolver
 ```
 To install uARMSolver on Windows, please follow to the [following instructions](WINDOWS_INSTALLATION.md).
 
