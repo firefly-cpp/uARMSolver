@@ -6,6 +6,7 @@
 </p>
 
 [![AUR package](https://img.shields.io/aur/version/uarmsolver?color=blue&label=Arch%20Linux&logo=arch-linux)](https://aur.archlinux.org/packages/uarmsolver)
+[![Fedora package](https://img.shields.io/fedora/v/uARMSolver?color=blue&label=Fedora%20Linux&logo=fedora)](https://src.fedoraproject.org/rpms/uARMSolver)
 
 ## Description
 
