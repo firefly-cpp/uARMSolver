@@ -26,7 +26,10 @@ bool Problem::init_tdbase(Setup setup, string tfile_name)
 		auto_parsing = true;
 
 	if (in.is_open()) {
+//cout << "File: " << tfile_name << endl;
+//int li = 1;
 		while (getline(in, line)) {
+//cout << "Line " << 	li++ << ": \'" << line << "\'" << endl;
 			vector<string> tokens;
 			token_line(line, tokens, ',');
 			if (auto_parsing) {

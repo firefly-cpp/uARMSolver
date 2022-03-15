@@ -18,6 +18,17 @@ Period = 1
 %Intervals = 5
 }
 
+% Squashing algorithm selection = {NONE, CAUCHY, EUCLID, ...}
+%Squash = EUCLID
+%CAUCHY_PARAM
+%{
+%THRESHOLD = 0.99
+%}
+%EUCLID_PARAM
+%{
+%THRESHOLD = 0.9
+%}
+
 % Algoritem selection = {NONE, DE, PSO, ...}
 Algorithm = DE
 % DE parameters

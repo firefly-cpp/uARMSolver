@@ -24,6 +24,7 @@
 #include "Setup.h"
 #include "Archive.h"
 #include "Problem.h"
+#include "Squash.h"
 
 #define N_DIM 10
 #define N_POP 100
@@ -99,9 +100,20 @@ int main(int argc, char* argv[])
 			str.append(f_name);
 		}
 
-		printf("Reading file= %d, f_name= %s...\n", i + 1, str.c_str());
+		printf("Reading transaction database= %d, f_name= %s...\n", i + 1, str.c_str());
 	    // read transaction database(s)
 		prob[i].init_tdbase(setup, str);
+
+		// squashing database if needed
+		if(setup.get_squash() > 0) {
+			Squash sq;
+			sq.make_sq_dbase(setup, prob[i]);
+			sq.write(setup);
+			sq.stat(prob[i]);
+			prob[i].dbase.clear();
+			prob[i].dbase = sq.sq_dbase;
+			sq.sq_dbase.clear();
+		}
 	}
 
 	Archive rules[setup.get_period()];
@@ -168,17 +180,20 @@ void solve(Setup setup, Problem problem, Archive &rules)
 	clock_t start_t, end_t; 	// time measuring in miliseconds
 
 	start_t = clock();
-
+	cout << "Solver strated..." << endl;
 	switch(setup.get_solver()) {
 	case SOLVER_DE: {
 		int n_dim = problem.get_dimension();
 		int n_np = setup.get_Np();
 		int n_run = setup.get_RUNs();
 
+		cout << "n_dim= " << n_dim << ", n_np= " << n_np << endl;
 		DESolver solver(n_dim, n_np, problem);
+		cout << "Setup..." << endl;
 		solver.Setup(setup.alg_param.de.strategy, setup.alg_param.de.scale, setup.alg_param.de.xover);
 		for(int i=0;i<n_run;i++) {
 			int n_fes = setup.get_FEs();
+			cout << "n_fes= " << n_fes << endl;
 			solver.Evolve(i, n_fes, rules);
 		}
 	}

@@ -43,6 +43,9 @@ bool Setup::read()
 				} else if (tokens[0].compare("Visualisation") == 0) {// visualizationblock
 					block = 3;
 					visual = vis_to_int(tokens[2]);
+				} else if (tokens[0].compare("Squash") == 0) {// squashing
+					block = 4;
+					squash = sq_to_int(tokens[2]);
 				} else if (tokens[0][0] == '%') {	// comment line - ignore
 					continue;
 				} else if (tokens[0][0] == '{') {	// start of block
@@ -59,6 +62,9 @@ bool Setup::read()
 						break;
 					case 3:		// parsing visualization block
 						parse_vis_blk(tokens);
+						break;
+					case 4:		// parsing squashing block
+						parse_sq_blk(tokens);
 						break;
 					}
 				}
@@ -102,6 +108,8 @@ void Setup::parse_prob_blk(vector<string>tokens)
 {
 	if(tokens[0].compare("Tdbase_name") == 0) {
 		tdbase_name = tokens[2];
+	} else if(tokens[0].compare("SqDbase_name") == 0) {
+		sq_dbase_name = tokens[2];
 	} else if(tokens[0].compare("Rule_name") == 0) {
 		rule_name = tokens[2];
 	} else if(tokens[0].compare("Out_name") == 0) {
@@ -232,6 +240,72 @@ int Setup::vis_to_int(string vis)
 }
 
 /**
+ * Parse the kind of squashing algorithm for solving ARM.
+ *
+ * @param the vector of parsed tokens.
+ * @return no return code.
+ */
+void Setup::parse_sq_blk(vector<string>tokens)
+{
+	switch(squash) {
+	case SQUASH_CAUCHY:
+		parse_sq_cauchy(tokens);
+		break;
+	case SQUASH_EUCLID:
+		parse_sq_euclid(tokens);
+		break;
+	}
+}
+
+/**
+ * Parse the parameter setting of the Cauchy squashing algorithm for solving ARM.
+ *
+ * @param the vector of parsed tokens.
+ * @return no return code.
+ */
+void Setup::parse_sq_cauchy(vector<string>tokens)
+{
+	if (tokens[0].compare("CAUCHY_PARAM") == 0) {
+		cout << "CAUCHY_PARAM started..." << endl;
+	} else if (tokens[0].compare("THRESHOLD") == 0) {
+		sq_param.sq.Thresh = stof(tokens[2]);
+	}
+}
+
+/**
+ * Parse the parameter setting of the Euclidian squashing algorithm for solving ARM.
+ *
+ * @param the vector of parsed tokens.
+ * @return no return code.
+ */
+void Setup::parse_sq_euclid(vector<string>tokens)
+{
+	if (tokens[0].compare("EUCLID_PARAM") == 0) {
+		cout << "EUCLID_PARAM started..." << endl;
+	} else if (tokens[0].compare("THRESHOLD") == 0) {
+		sq_param.sq.Thresh = stof(tokens[2]);
+	}
+}
+
+/**
+ * Map the squashing method from string.
+ *
+ * @param the string.
+ * @return integer return code identifying the visualization method.
+ */
+int Setup::sq_to_int(string sq)
+{
+	int n_sq = SQUASH_NONE;
+
+	if(sq.compare("CAUCHY") == 0) {
+		n_sq = SQUASH_CAUCHY;
+	} else if(sq.compare("EUCLID") == 0) {
+		n_sq = SQUASH_EUCLID;
+	}
+	return n_sq;
+}
+
+/**
  * Print out all three parameter parts determining a behavior of the solver.
  *
  * @param no input parameters.
@@ -242,6 +316,7 @@ void Setup::print_param()
     print_prob_blk();
     print_alg_blk();
     print_vis_blk();
+    print_sq_blk();
 }
 
 /**
@@ -255,6 +330,7 @@ void Setup::print_prob_blk()
 	cout << "Problem block setup: " << endl;
 	cout << "---------------------" << endl;
 	cout << "Tdbase_name= " << tdbase_name << endl;
+	cout << "SqDbase_name= " << sq_dbase_name << endl;
 	cout << "Rule_name= " << rule_name << endl;
 	cout << "Out_name= " << out_name << endl;
 	cout << "Period= " << period << endl;
@@ -311,6 +387,31 @@ void Setup::print_vis_blk()
 		break;
 	case VISUAL_METRO:
 		cout << "Method= METRO_MAP" << endl;
+		break;
+	default:
+		cout << "Method= NONE" << endl;
+	}
+	cout << "---------------------" << endl;
+}
+
+/**
+ * Print out the parameter setting of the squashing method.
+ *
+ * @param no input parameters.
+ * @return no return code.
+ */
+void Setup::print_sq_blk()
+{
+	cout << "Squashing block setup: " << endl;
+	cout << "---------------------" << endl;
+
+	switch(squash) {
+	case SQUASH_CAUCHY:
+		cout << "Method= CAUCHY" << endl;
+		cout << "Threshold= " << sq_param.sq.Thresh << endl;
+		break;
+	case SQUASH_EUCLID:
+		cout << "Method= EUCLID" << endl;
 		break;
 	default:
 		cout << "Method= NONE" << endl;

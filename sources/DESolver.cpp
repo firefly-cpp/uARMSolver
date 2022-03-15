@@ -23,13 +23,13 @@ DESolver::DESolver(int dim,int popSize,	Problem problem) :
 {
 	prob = problem;
 	nDim = eval.encode(D, prob);
-
+cout << "DESolver: dim= " << nDim << ", nPop= " << nPop << endl;
 	for(int i=0;i<nDim;i++) {
 		trialSolution.push_back(0.0);
 		bestSolution.push_back(0.0);
 	}
 	for(int i=0;i<nPop;i++) {
-		popEnergy.push_back(0-0);
+		popEnergy.push_back(0.0);
 		vector<double> row;
 		for(int j=0;j<nDim;j++) {
 			row.push_back(0.0);
@@ -69,7 +69,7 @@ void DESolver::Setup(int deStrategy, double diffScale, double crossoverProb)
 	strategy	= deStrategy;
 	scale		= diffScale;
 	probability = crossoverProb;
-	
+cout << "Initialisation of population..." << endl;
 	for (i=0; i < nPop; i++)
 	{
 		for (int j=0; j < nDim; j++)
