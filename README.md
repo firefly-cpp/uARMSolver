@@ -33,6 +33,11 @@ To install uARMSolver on [Arch-based distributions](https://wiki.archlinux.org/t
 ```sh
 $ yay -Syyu uarmsolver
 ```
+To install uARMSolver on Alpine Linux, please enable Testing repository and use:
+
+```sh
+$ apk add uarmsolver
+```
 To install uARMSolver on Windows, please follow to the [following instructions](WINDOWS_INSTALLATION.md).
 
 
