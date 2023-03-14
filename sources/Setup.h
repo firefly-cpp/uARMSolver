@@ -39,7 +39,7 @@ using namespace std;
 	};
 
 	// squashing setups
-	struct sq_param {
+	struct squashing_param {
 		double 	Thresh;
 	};
 
@@ -130,8 +130,8 @@ public:
 	} vis_param;			///< visualization parameters
 
 	union {
-		sq_param sq;
-	} sq_param;				///< squashing parameters
+		squashing_param sq;
+	} squ_param;				///< squashing parameters
 
 };
 
