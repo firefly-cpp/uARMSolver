@@ -268,7 +268,7 @@ void Setup::parse_sq_cauchy(vector<string>tokens)
 	if (tokens[0].compare("CAUCHY_PARAM") == 0) {
 		cout << "CAUCHY_PARAM started..." << endl;
 	} else if (tokens[0].compare("THRESHOLD") == 0) {
-		sq_param.sq.Thresh = stof(tokens[2]);
+		squashing_param.sq.Thresh = stof(tokens[2]);
 	}
 }
 
@@ -283,7 +283,7 @@ void Setup::parse_sq_euclid(vector<string>tokens)
 	if (tokens[0].compare("EUCLID_PARAM") == 0) {
 		cout << "EUCLID_PARAM started..." << endl;
 	} else if (tokens[0].compare("THRESHOLD") == 0) {
-		sq_param.sq.Thresh = stof(tokens[2]);
+		squashing_param.sq.Thresh = stof(tokens[2]);
 	}
 }
 
@@ -408,7 +408,7 @@ void Setup::print_sq_blk()
 	switch(squash) {
 	case SQUASH_CAUCHY:
 		cout << "Method= CAUCHY" << endl;
-		cout << "Threshold= " << sq_param.sq.Thresh << endl;
+		cout << "Threshold= " << squashing_param.sq.Thresh << endl;
 		break;
 	case SQUASH_EUCLID:
 		cout << "Method= EUCLID" << endl;
