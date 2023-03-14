@@ -47,7 +47,7 @@ int Squash::make_sq_dbase(Setup setup, Problem prob)
 						sim = sq_similarity(prob.dbase[pos], prob.dbase[i]);
 					else
 						sim = sq_distance(prob.dbase[pos], prob.dbase[i], prob.feat);
-					if(sim >= setup.squashing_param.sq.Thresh) {
+					if(sim >= setup.squ_param.sq.Thresh) {
 						sq_set.push_back(prob.dbase[i]);
 						set_squashed(i);
 						k++;

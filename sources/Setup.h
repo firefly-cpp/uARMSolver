@@ -131,7 +131,7 @@ public:
 
 	union {
 		squashing_param sq;
-	} squashing_param;				///< squashing parameters
+	} squ_param;				///< squashing parameters
 
 };
 
