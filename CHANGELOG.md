@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.2.5](https://github.com/firefly-cpp/uARMSolver/tree/0.2.5) (2023-03-14)
+
+[Full Changelog](https://github.com/firefly-cpp/uARMSolver/compare/0.2.4...0.2.5)
+
+**Merged pull requests:**
+
+- fix squashing [\#15](https://github.com/firefly-cpp/uARMSolver/pull/15) ([firefly-cpp](https://github.com/firefly-cpp))
+
+## [0.2.4](https://github.com/firefly-cpp/uARMSolver/tree/0.2.4) (2022-03-15)
+
+[Full Changelog](https://github.com/firefly-cpp/uARMSolver/compare/0.2.3...0.2.4)
+
+**Closed issues:**
+
+- Add installation instructions for Arch Linux [\#12](https://github.com/firefly-cpp/uARMSolver/issues/12)
+
+**Merged pull requests:**
+
+- Add instructions for install from AUR, and a badge [\#13](https://github.com/firefly-cpp/uARMSolver/pull/13) ([carlosal1015](https://github.com/carlosal1015))
+
 ## [0.2.3](https://github.com/firefly-cpp/uARMSolver/tree/0.2.3) (2022-01-22)
 
 [Full Changelog](https://github.com/firefly-cpp/uARMSolver/compare/0.2.2...0.2.3)
