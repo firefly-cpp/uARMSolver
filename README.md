@@ -9,15 +9,15 @@
 [![Fedora package](https://img.shields.io/fedora/v/uARMSolver?color=blue&label=Fedora%20Linux&logo=fedora)](https://src.fedoraproject.org/rpms/uARMSolver)
 [![DOI](https://img.shields.io/badge/DOI-10.48550/arXiv.2010.10884-blue)](https://doi.org/10.48550/arXiv.2010.10884)
 
-## Description
+## Description 📋
 
-The framework is written fully in C++ and runs on all platforms. It allows users to preprocess their data in a transaction database, to make discretization of data, to search for association rules and to guide a presentation/visualization of the best rules found using external tools. As opposed to the existing software packages or frameworks, this also supports numerical and real-valued types of attributes besides the categorical ones. Mining the association rules is defined as an optimization and solved using the nature-inspired algorithms that can be incorporated easily. Because the algorithms normally discover a huge amount of association rules, the framework enables a modular inclusion of so-called visual guiders for extracting the knowledge hidden in data, and visualize these using external tools.
+The framework is written fully in C++ and runs on all platforms. 🖥️ It allows users to preprocess their data in a transaction database, to make discretization of data, to search for association rules and to guide a presentation/visualization of the best rules found using external tools. 📊 As opposed to the existing software packages or frameworks, this also supports numerical and real-valued types of attributes besides the categorical ones. Mining the association rules is defined as an optimization and solved using the nature-inspired algorithms that can be incorporated easily. 🌿 Because the algorithms normally discover a huge amount of association rules, the framework enables a modular inclusion of so-called visual guiders for extracting the knowledge hidden in data, and visualize these using external tools. 🔍
 
-## Compiling
+## Compiling 🛠️
 
     make
 
-## Installation
+## Installation 📦
 
 To install uARMSolver on Fedora, use:
 
@@ -42,7 +42,7 @@ $ apk add uarmsolver
 To install uARMSolver on Windows, please follow to the [following instructions](WINDOWS_INSTALLATION.md).
 
 
-## Run example
+## Run example 🚀
 
     ./uARMSolver -s arm.set
 
