@@ -49,6 +49,18 @@ To install uARMSolver on Windows, please follow to the [following instructions](
 arm.set is a problem definition file. Check [README](bin/README.txt)
  for more details about the format of .set file.
 
+
+## Docker Container
+
+If you prefer to use a Docker container for running `uARMSolver`, you can use the `uarmsolver-container` repository. This repository provides a Docker setup for running `uARMSolver`.
+
+### uARMSolver Container
+
+The `uarmsolver-container` repository contains a Docker container setup for running `uARMSolver`. You can find it here: [uarmsolver-container on Codeberg](https://codeberg.org/firefly-cpp/uarmsolver-container).
+
+To build and run the Docker container, follow the instructions in the [uarmsolver-container README](https://codeberg.org/firefly-cpp/uarmsolver-container#readme).
+
+
 ## Reference Papers (software is based on ideas from):
 
 [1] I. Fister Jr., A. Iglesias, A. Gálvez, J. Del Ser, E. Osaba, I Fister. [Differential evolution for association rule mining using categorical and numerical attributes](http://www.iztok-jr-fister.eu/static/publications/231.pdf) In: Intelligent data engineering and automated learning - IDEAL 2018, pp. 79-88, 2018.
