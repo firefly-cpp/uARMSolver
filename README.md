@@ -50,11 +50,11 @@ arm.set is a problem definition file. Check [README](bin/README.txt)
  for more details about the format of .set file.
 
 
-## 🐳 Docker Container
+## Docker Container 🐳
 
 If you prefer to use a Docker container for running `uARMSolver`, you can use the `uarmsolver-container` repository. This repository provides a Docker setup for running `uARMSolver`.
 
-### 📦 uARMSolver Container
+### uARMSolver Container 📦
 
 The `uarmsolver-container` repository contains a Docker container setup for running `uARMSolver`. You can find it here: [uarmsolver-container on Codeberg](https://codeberg.org/firefly-cpp/uarmsolver-container).
 
