@@ -1,16 +1,5 @@
 /**
- * Association Rule Mining Test Program
- * Based on nature-inspired algorithms (DE, PSO etc.)
- * Written By: Iztok Fister
- *             FERI Maribor
- *             Maribor, Slovenia
- *             iztok.fister@um.si
- * Created: July 2020
- * Last Modified: 11/9/20
- * Revision: 1.0
- *
- * Help function (add version number) - fixed at 2.10.2020 by Fister Iztok.
- *
+ * Numerical Association Rule Mining using DE, PSO...
  */
 
 #include <stdio.h>
@@ -164,7 +153,7 @@ int main(int argc, char* argv[])
  */
 void help(FILE * stream)
 {
-	fprintf(stream, "uARMSolver version 1.0 (October 2020)\n\n");	// fixed at 2.10.2020 by Fister Iztok
+	fprintf(stream, "uARMSolver version 0.3.0 (July 2024)\n\n");
 	fprintf(stream, "Syntax\n");
 	fprintf(stream, "  uARMSolver [-v|-?] [-s'arm.set'|-s 'arm.set']\n");
 }
