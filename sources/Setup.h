@@ -23,6 +23,8 @@
 #define SQUASH_CAUCHY	1
 #define SQUASH_EUCLID	2
 
+#define uint unsigned int
+
 using namespace std;
 
 	// algorithm's setups

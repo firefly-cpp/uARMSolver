@@ -18,6 +18,7 @@
 #include "Rule.h"
 #include "Setup.h"
 
+#define uint unsigned int
 
 using namespace std;
 

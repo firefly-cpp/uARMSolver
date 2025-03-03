@@ -5,6 +5,8 @@
 
 #include "Attribute.h"
 
+#define uint unsigned int
+
 using namespace std;
 
 typedef struct {
