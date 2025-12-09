@@ -52,7 +52,7 @@ using namespace std;
  * @return return code (0, if program stops normally).
  */
 int main(int argc, char *argv[]) {
-	string s_name = "";
+	string s_name = "arm.set";
 
 	for (int i = 1; i < argc; i++) {
 		if ((strncmp(argv[i], "-v", 2) == 0)
