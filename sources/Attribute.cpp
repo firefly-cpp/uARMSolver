@@ -30,9 +30,13 @@ void Attribute::enter(int item)
  */
 void Attribute::enter(double item)
 {
+	present = true;
+	if(type == ATTR_NUMERICAL) {
+		present = false;
+cout << "Exception: Type= " << type << " must be changed to " << ATTR_REAL_VALUED << endl;
+	}
 	type = ATTR_REAL_VALUED;
 	f_val = item;
-	present = true;
 }
 
 /**

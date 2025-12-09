@@ -1,10 +1,13 @@
-#include <bits/stdc++.h>
 #include "Setup.h"
+
+#include <bits/stdc++.h>
 
 Setup::Setup(string fname)
 {
 	// TODO Auto-generated constructor stub
 	arm_set_name = fname;
+	n_intervals = 5;
+	squash = 0;
 }
 
 Setup::~Setup()
@@ -116,6 +119,8 @@ void Setup::parse_prob_blk(vector<string>tokens)
 		out_name = tokens[2];
 	} else if(tokens[0].compare("Period") == 0) {
 		period = stoi(tokens[2]);
+	} else if(tokens[0].compare("Intervals") == 0) {
+		n_intervals= stoi(tokens[2]);
 	}
 }
 
@@ -170,7 +175,21 @@ void Setup::parse_alg_de(vector<string>tokens)
  */
 void Setup::parse_alg_pso(vector<string>tokens)
 {
-
+	if (tokens[0].compare("PSO_PARAM") == 0) {
+		cout << "PSO_PARAM started..." << endl;
+	} else if (tokens[0].compare("PSO_NP") == 0) {
+		Np = stoi(tokens[2]);
+	} else if (tokens[0].compare("PSO_FES") == 0) {
+		FEs = stoi(tokens[2]);
+	} else if (tokens[0].compare("PSO_RUNS") == 0) {
+		RUNs = stoi(tokens[2]);
+	} else if (tokens[0].compare("PSO_P1") == 0) {
+		alg_param.pso.inertia_weight = stof(tokens[2]);
+	} else if (tokens[0].compare("PSO_P2") == 0) {
+		alg_param.pso.coefficient_1 = stof(tokens[2]);
+	} else if (tokens[0].compare("PSO_P3") == 0) {
+		alg_param.pso.coefficient_2 = stof(tokens[2]);
+	}
 }
 
 /**
@@ -334,7 +353,7 @@ void Setup::print_prob_blk()
 	cout << "Rule_name= " << rule_name << endl;
 	cout << "Out_name= " << out_name << endl;
 	cout << "Period= " << period << endl;
-//	cout << "Intervals= " << intervals << endl;
+	cout << "Intervals= " << n_intervals << endl;
 	cout << "---------------------" << endl;
 }
 
@@ -361,6 +380,12 @@ void Setup::print_alg_blk()
 		break;
 	case SOLVER_PSO:
 		cout << "Algorithm= PSO" << endl;
+		cout << "NP= " << Np << endl;
+		cout << "FES= " << FEs << endl;
+		cout << "RUNS= " << RUNs << endl;
+		cout << "Inertia weight= " << alg_param.pso.inertia_weight << endl;
+		cout << "Cognitive coefficient= " << alg_param.pso.coefficient_1 << endl;
+		cout << "Social coefficient= " << alg_param.pso.coefficient_2 << endl;
 		break;
 	default:
 		cout << "Algorithm= NONE" << endl;

@@ -1,4 +1,5 @@
 #include "Problem.h"
+#include <cstring>
 
 Problem::Problem()
 {
@@ -22,18 +23,30 @@ bool Problem::init_tdbase(Setup setup, string tfile_name)
 	int num_line = 0;
 	string line;
 
+	cout << "init_tdbase= started..." << endl;
 	if(tfile_name.compare(tfile_name.size()-5,4,".csv"))
 		auto_parsing = true;
 
 	if (in.is_open()) {
-//cout << "File: " << tfile_name << endl;
+		cout << "File: " << tfile_name << endl;
 //int li = 1;
 		while (getline(in, line)) {
-//cout << "Line " << 	li++ << ": \'" << line << "\'" << endl;
+cout << "Line " << 	num_line+1 << ": \'" << line << "\'" << endl;
 			vector<string> tokens;
 			token_line(line, tokens, ',');
+/*
+			// debug
+			for (uint i = 0; i < tokens.size(); i++) {
+				cout << "Token[" << i << "]: " << tokens[i];
+				for (uint j = 0; j < tokens[i].size(); j++) {
+					cout << "\'" << tokens[i][j] << "\' ";
+				}
+				cout << endl;
+			}
+*/
 			if (auto_parsing) {
 				for (uint i = 0; i < tokens.size(); i++) {
+//cout << "Token: " << tokens[i] << endl;
 					if (num_line == 0) {
 						new_feat(tokens[i]);
 					} else {
@@ -43,6 +56,8 @@ bool Problem::init_tdbase(Setup setup, string tfile_name)
 				}
 			}
 			num_line++;
+			tokens.clear();
+//if (num_line == 5) exit(-1);
 		}
 		readed = true;
 		cout << "File " << tfile_name << " read successfully." << endl;
@@ -52,7 +67,10 @@ bool Problem::init_tdbase(Setup setup, string tfile_name)
 	}
 
 	disc_attr();
-	print_feat();
+	print_feat(setup.get_intervals());
+//	print_rand_var(10);
+
+	cout << "init_tdbase= ...OK." << endl;
 
 	return readed;
 }
@@ -83,35 +101,73 @@ int Problem::analyze_token(string token, int n_feat, int n_tran)
 	if(n_feat==0) {	// enter a new transaction
 		n_tran = new_tran();
 	}
-
+//cout << "Token: " << token << ", init= " << feat[n_feat].init << ", n_feat= " << n_feat << ", n_tran= " << n_tran << ", type= ";
 	if(token.size() == 0) {	// attribute not present?
 		dbase[n_tran][n_feat].not_present();
 	} else if (containsOnlyDigit (token)) {	// is numerical?
+//cout << "containsOnlyDigit " << endl;
 		if (!feat[n_feat].init) {
 			feat[n_feat].type = ATTR_NUMERICAL;
 			feat[n_feat].i_num.lower = feat[n_feat].i_num.upper = stoi(token);
 			feat[n_feat].init = true;
 		}
-		dbase[n_tran][n_feat].enter(stoi(token));
-		feat[n_feat].enter(stoi(token));
+		if(feat[n_feat].type == ATTR_NUMERICAL) {
+			dbase[n_tran][n_feat].enter(stoi(token));
+			feat[n_feat].enter(stoi(token));
+		} else {
+//cout << "Expected type= " << feat[n_feat].type << " proposed type= ATTR_NUMERICAL" << endl;
+			dbase[n_tran][n_feat].enter(stod(token));
+			feat[n_feat].enter(stod(token));
+		}
+//cout << "Numerical " << feat[n_feat].type  << endl;
 	} else if (containsFloatingPoint(token)) {	// is real valued?
+//cout << "containsFloatingPoint " << endl;
 		if (!feat[n_feat].init) {
 			feat[n_feat].type = ATTR_REAL_VALUED;
 			feat[n_feat].f_num.lower = feat[n_feat].f_num.upper = stod(token);
 			feat[n_feat].init = true;
 		}
+//cout << "Float " << feat[n_feat].type  << endl;
 		dbase[n_tran][n_feat].enter(stod(token));
+		if(!dbase[n_tran][n_feat].present) {
+			reassign_type(n_tran, n_feat);
+			dbase[n_tran][n_feat].present = true;
+		}
 		feat[n_feat].enter(stod(token));
 	} else {	// is categorial!
+//cout << "Is categorical " << endl;
 		if (!feat[n_feat].init) {
 			feat[n_feat].type = ATTR_CATEGORICAL;
 			feat[n_feat].init = true;
 		}
+//cout << "Categorical " << feat[n_feat].type << endl;
 		dbase[n_tran][n_feat].enter(token);
+		if(!dbase[n_tran][n_feat].present) {
+			reassign_type(n_tran, n_feat);
+		}
 		feat[n_feat].enter(token, true);
 	}
 
 	return n_tran;
+}
+
+void Problem::reassign_type(int n_tran, int n_feat) {
+cout << "reassign_type: from type= " << feat[n_feat].type << " [" << feat[n_feat].i_num.lower << "," << feat[n_feat].i_num.upper << "] to [";
+	feat[n_feat].type = ATTR_REAL_VALUED;
+	feat[n_feat].f_num.lower = feat[n_feat].f_num.upper = (double) dbase[n_tran][n_feat].f_val;
+	for(int i=0;i<=n_tran-1;i++) {
+		dbase[i][n_feat].f_val = (double) dbase[i][n_feat].i_val;
+		dbase[i][n_feat].type = dbase[n_tran][n_feat].type;
+		if (dbase[i][n_feat].f_val  < feat[n_feat].f_num.lower ) {	// new lower bound
+			feat[n_feat].f_num.lower = dbase[i][n_feat].f_val;
+		}
+		if ( dbase[i][n_feat].f_val > feat[n_feat].f_num.upper ) {	// new upper bound
+			feat[n_feat].f_num.upper = dbase[i][n_feat].f_val;
+		}
+
+	}
+	dbase[n_tran][n_feat].present = true;
+cout << feat[n_feat].f_num.lower << "," << feat[n_feat].f_num.upper << "]." << endl;
 }
 
 /**
@@ -183,11 +239,16 @@ bool Problem::containsFloatingPoint(string str)
 bool Problem::containsOnlyDigit(string str)
 {
     int l = str.length();
+//cout << "containsOnlyDigit: " << str << " l= " << l << " " << endl;
     for (int i = 0; i < l; i++)
     {
-        if (str.at(i) < '0' || str.at(i) > '9')
+//cout << "\'" << str.at(i) << "\' [" << std::hex << str.at(i) << "] " << std::dec << endl;
+        if ((str.at(i) < '0' || str.at(i) > '9') && str.at(i) != '-' && str.at(i) != '\r') {
+//cout << " return FALSE" << endl;
             return false;
+        }
     }
+//cout << " return TRUE" << endl;
     return true;
 }
 
@@ -197,16 +258,33 @@ bool Problem::containsOnlyDigit(string str)
  * @param the input line, the vector of output tokens, and the delimiter character.
  * @return no return code.
  */
-void Problem::token_line(string line, vector<string> &tokens, char ch)
-{
-	stringstream check1(line);
-	string intermediate;
+void Problem::token_line(string line, vector<string> &tokens, char ch) {
 
 	// Tokenizing w.r.t. space ' '
-	while(getline(check1, intermediate, ch))
-	{
-		tokens.push_back(intermediate);
+	char *cstr = new char[line.length() + 1];
+	std::strcpy(cstr, line.c_str());
+
+	// cstr now contains a c-string copy of str
+	char delim[4];
+	sprintf(delim, "%c%c%c", ch, 0x0a, 0x0d);
+	char *p = std::strtok(cstr, delim);
+
+	while (p != 0) {
+		tokens.push_back(p);
+		p = std::strtok(NULL, delim);
+//		std::cout << "[" << ++i << "]= \'" << p << "\'" << '\n';
 	}
+
+	delete[] cstr;
+	/*
+	 stringstream check1(line);
+	 string intermediate;
+	 while(getline(check1, intermediate, ch)) {
+	 tokens.push_back(intermediate);
+	 cout << "check1= \'" << check1.str() << "\' : [" << i+1 << "]= \'" << intermediate << "\'" << endl;
+	 i++;
+	 }
+	*/
 }
 
 /**
@@ -371,8 +449,9 @@ void Problem::print_tokens(vector<string>tokens)
  * @param no input parameters.
  * @return no return code.
  */
-void Problem::print_feat()
+void Problem::print_feat(int intervals)
 {
+
 	// print feature
 	cout << "Feature table:" << endl;
 	for (uint i = 0; i < feat.size(); i++) {
@@ -380,9 +459,19 @@ void Problem::print_feat()
 		if(feat[i].type == ATTR_CATEGORICAL) {
 			cout << "Type=CATEGORICAL,";
 		} else if (feat[i].type == ATTR_NUMERICAL) {
-			cout << "Type=NUMERICAL,Interval=[" << feat[i].i_num.lower << "," << feat[i].i_num.upper << "],";
+			int Delta = feat[i].i_num.upper - feat[i].i_num.lower;
+			int delta = 0;
+			if(intervals > 1)
+				delta = Delta/intervals;
+			cout << "Type=NUMERICAL,Interval=[" << feat[i].i_num.lower << "," << feat[i].i_num.upper <<
+					"], Delta= " << Delta << ", offset= " << delta << ", ";
 		} else {
-			cout << "Type=REAL_VALUED,Interval=[" << feat[i].f_num.lower << "," << feat[i].f_num.upper << "],";
+			double Delta = feat[i].f_num.upper - feat[i].f_num.lower;
+			double delta = 0;
+			if(intervals > 1)
+				delta = Delta/(double) intervals;
+			cout << "Type=REAL_VALUED,Interval=[" << feat[i].f_num.lower << "," << feat[i].f_num.upper <<
+					"], Delta= " << Delta << ", offset= " << delta << ", ";
 		}
 		print_hash(feat[i].hash);
 	}
@@ -429,3 +518,82 @@ void Problem::print_hash(vector<string> hash)
 	cout << "}>" << endl;
 }
 
+void Problem::print_rand_var(int classes)
+{
+	cout << "Classes= " << classes << endl;
+	vector < vector <int> > freq(feat.size(), vector<int>(classes, 0));
+
+	for (uint i = 0; i < feat.size(); i++) {
+		for (uint j = 0; j < dbase.size(); j++) {
+			if(dbase[j][i].present) {
+				if(feat[i].type == ATTR_CATEGORICAL) {
+					int k = find_classS(feat[i].hash, dbase[j][i].s_val);
+					if(k>=0) {
+						freq[i][k]++;
+//						cout << "s_val= " << dbase[j][i].s_val << " : freq[" << i << "," << k << "]= " << freq[i][k] << endl;
+					}
+				} else if(feat[i].type == ATTR_NUMERICAL) {
+					int k = find_classI(feat[i].i_num, classes, dbase[j][i].i_val);
+					if(k>=0) {
+						freq[i][k]++;
+//						cout << dbase[j][i].f_val << " : [";
+//						cout << feat[i].f_num.lower << "," << feat[i].f_num.upper << "] --> ";
+//						cout << "freq[" << i << "," << k << "]= " << freq[i][k] << endl;
+					}
+//					exit(-1);
+				} else {
+					int k = find_classF(feat[i].f_num, classes, dbase[j][i].f_val);
+					if(k>=0) {
+						freq[i][k]++;
+//						cout << dbase[j][i].f_val << " : [";
+//						cout << feat[i].f_num.lower << "," << feat[i].f_num.upper << "] --> ";
+//						cout << "freq[" << i << "," << k << "]= " << freq[i][k] << endl;
+					}
+//					exit(-1);
+				}
+			}
+		}
+		print_freq(freq, i, classes);
+	}
+	cout << "Classes= ...OK" << endl;
+}
+
+void Problem::print_freq(vector < vector <int> > freq, int k, int classes)
+{
+	int summ = 0;
+	cout << "Feat: " << k << " [";
+	for(int i=0;i<classes;i++) {
+		cout << freq[k][i] << ",";
+		summ += freq[k][i];
+	}
+	cout << "] --> " << summ << endl;
+}
+
+int Problem::find_classS(vector<string> hash, string str)
+{
+	for (uint i = 0; i < hash.size(); i++) {
+		if(hash[i] == str)
+			return i;
+	}
+	return -1;
+}
+
+int Problem::find_classI(int_bounds bound, int classes, int val)
+{
+	int delta = bound.upper-bound.lower;
+	int map = trunc(classes*(val-bound.lower)/delta);
+	if(map == classes)
+		map--;
+
+	return map;
+}
+
+int Problem::find_classF(float_bounds bound, int classes, float val)
+{
+	float delta = bound.upper-bound.lower;
+	int map = trunc((float) classes*(val-bound.lower)/delta);
+	if(map == classes)
+		map--;
+
+	return map;
+}

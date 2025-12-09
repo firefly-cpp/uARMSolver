@@ -55,7 +55,7 @@ public:
 	
 	// Setup() must be called before solve to set min, max, strategy etc.
 	// void Setup(double min[],double max[],int deStrategy, double diffScale,double crossoverProb);
-	void Setup(int strategy, double scale, double xover);
+	void Setup(int strategy, double scale, double xover, int n_intervals);
 	// Solve() returns true if EnergyFunction() returns true.
 	// Otherwise it runs maxGenerations generations and returns false.
 	void Evolve(int run, int maxFEs, Archive &rules);
@@ -66,6 +66,7 @@ public:
 	int Dimension(void) { return(nDim); }
 	int Population(void) { return(nPop); }
 	int Generations(void) { return(generations); }
+	double GetBestEnergy() { return bestEnergy; }
 
 protected:
 	void SelectSamples(int candidate,int *r1,int *r2=0,int *r3=0, int *r4=0,int *r5=0);
@@ -76,6 +77,7 @@ protected:
 	int nPop;
 	int generations;
 	int strategy;
+	int intervals;
 
 	double scale;
 	double probability;

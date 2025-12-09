@@ -1,5 +1,5 @@
-#ifndef PROBLEM_H_
-#define PROBLEM_H_
+#ifndef SOURCES_PROBLEM_H_
+#define SOURCES_PROBLEM_H_
 
 #include <stdio.h>
 #include <math.h>
@@ -18,7 +18,6 @@
 #include "Rule.h"
 #include "Setup.h"
 
-#define uint unsigned int
 
 using namespace std;
 
@@ -51,18 +50,26 @@ public:
 	void make_pair(int i, int j, string &attr);
 	bool isIncluded(int i, int j, Rule rule);
 	void disc_attr();
+	void reassign_type(int n_tran, int n_feat);
 
 	void print_hash();
 	void print_tokens(vector<string>tokens);
-	void print_feat();
+	void print_feat(int intervals);
 	void print_attr();
 	void print_hash(vector<string> hash);
+	void print_rand_var(int classes);
+	void print_freq(vector < vector <int> > freq, int k, int classes);
+
+	int find_classS(vector<string> hash, string str);
+	int find_classI(int_bounds bound, int classes, int val);
+	int find_classF(float_bounds bound, int classes, float val);
 
 	int get_dimension() { return feat.size(); }
 
 public:
 	vector<Feature> feat;				///< list of features
 	vector< vector<Attribute> > dbase;	///< transaction database represented as a collection of attributes
+//	vector<vector<int> > freq;				///< frequency of occurrences
 };
 
-#endif /* PROBLEM_H_ */
+#endif /* SOURCES_PROBLEM_H_ */
