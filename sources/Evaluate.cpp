@@ -26,11 +26,11 @@ Evaluate::~Evaluate()
  * @param the trial vector, the problem definition, and the mined association rule.
  * @return double return code: the calculated fitness value.
  */
-double Evaluate::EnergyFunction(vector<double> x, Problem prob, Rule &rule)
+double Evaluate::EnergyFunction(vector<double> x, Problem prob, Rule &rule, int intervals)
 {
 	double result = 0;
 
-	decode(x, prob.feat, rule);
+	decode(x, prob.feat, rule, intervals);
 
 	if(rule.isValid()) {
 		rule.set_support(prob.calc_support(rule));
@@ -72,7 +72,7 @@ int Evaluate::encode(int D, Problem prob)
  * @param the real-valued vector, the list of features, and the mined association rule.
  * @return no return code.
  */
-void Evaluate::decode(vector<double> x, vector<Feature> feat, Rule &rule)
+void Evaluate::decode(vector<double> x, vector<Feature> feat, Rule &rule, int intervals)
 {
 	for(uint i=0;i<pointers.size();i++) {
 		rule.init(i, x[pointers[i]]);
@@ -89,7 +89,9 @@ void Evaluate::decode(vector<double> x, vector<Feature> feat, Rule &rule)
 		bool taken = false;
 		int ptr = pointers[rule.perm[i]];
 		string pair = feat[rule.perm[i]].f_name+"_";
+//cout << pair << ": Type= ";
 		if(feat[rule.perm[i]].type == ATTR_CATEGORICAL) {	// categorical attribute
+//cout << "CATEGORICAL" << endl;
 			if(random01() < x[ptr+2]) {
 				uint val = x[ptr+1]*feat[rule.perm[i]].hash.size();
 				if(val == feat[rule.perm[i]].hash.size())	// fixed at 2.10.2020 by Fister Iztok
@@ -98,15 +100,32 @@ void Evaluate::decode(vector<double> x, vector<Feature> feat, Rule &rule)
 				taken = true;
 			}
 		} else if(feat[rule.perm[i]].type == ATTR_NUMERICAL) {	// numerical attribute
+//cout << "NUMERICAL" << endl;
 			if (random01() < x[ptr + 3]) {
 				int a, b;
+				int Delta = feat[rule.perm[i]].i_num.upper - feat[rule.perm[i]].i_num.lower;
+//				cout << "Delta= " << Delta << ", intervals= " << intervals;
+				int delta = 0;
+				if(intervals > 1)
+					delta = Delta/intervals;
+//				cout << ", delta= " << delta << endl;
+				// decoding
 				if (x[ptr + 1] > x[ptr + 2]) {
-					a = (feat[rule.perm[i]].i_num.upper - feat[rule.perm[i]].i_num.lower) * x[ptr + 2] + feat[rule.perm[i]].i_num.lower;
-					b = (feat[rule.perm[i]].i_num.upper - feat[rule.perm[i]].i_num.lower) * x[ptr + 1] + feat[rule.perm[i]].i_num.lower;
+					a = Delta * x[ptr + 2] + feat[rule.perm[i]].i_num.lower;
+					b = Delta * x[ptr + 1] + feat[rule.perm[i]].i_num.lower;
 				} else {
-					a = (feat[rule.perm[i]].i_num.upper - feat[rule.perm[i]].i_num.lower) * x[ptr + 1] + feat[rule.perm[i]].i_num.lower;
-					b = (feat[rule.perm[i]].i_num.upper - feat[rule.perm[i]].i_num.lower) * x[ptr + 2] + feat[rule.perm[i]].i_num.lower;
+					a = Delta * x[ptr + 1] + feat[rule.perm[i]].i_num.lower;
+					b = Delta * x[ptr + 2] + feat[rule.perm[i]].i_num.lower;
 				}
+				// repairing
+				if((delta >= 0) && ((b-a) > delta)) {
+//					cout << "Repairing NUMERICAL: [" << a << "," << b << "] ==> ";
+					b = a + delta;
+//					cout << "[" << a << "," << b << "]." << endl;
+				} else {
+//					cout << "NO repairing NUMERICAL: [" << a << "," << b << "]." << endl;
+				}
+				// proceed
 				char str_pom[256];
 				sprintf(str_pom, "%d_%d", a, b);
 				string attr(str_pom);
@@ -114,20 +133,38 @@ void Evaluate::decode(vector<double> x, vector<Feature> feat, Rule &rule)
 				taken = true;
 			}
 		} else {
+//cout << "FLOATING-POINT" << endl;
 			if (random01() < x[ptr + 3]) {
 				double a, b;
+				double Delta = feat[rule.perm[i]].f_num.upper - feat[rule.perm[i]].f_num.lower;
+//				cout << "Delta= " << Delta << ", intervals= " << intervals;
+				double delta = 0;
+				if(intervals > 1)
+					delta = Delta/(double) intervals;
+//				cout << ", delta= " << delta << endl;
+				// decoding
 				if (x[ptr + 1] > x[ptr + 2]) {
-					a = (feat[rule.perm[i]].f_num.upper - feat[rule.perm[i]].f_num.lower) * x[ptr + 2] + feat[rule.perm[i]].f_num.lower;
-					b = (feat[rule.perm[i]].f_num.upper - feat[rule.perm[i]].f_num.lower) * x[ptr + 1] + feat[rule.perm[i]].f_num.lower;
+					a = Delta * x[ptr + 2] + feat[rule.perm[i]].f_num.lower;
+					b = Delta * x[ptr + 1] + feat[rule.perm[i]].f_num.lower;
 				} else {
-					a = (feat[rule.perm[i]].f_num.upper - feat[rule.perm[i]].f_num.lower) * x[ptr + 1] + feat[rule.perm[i]].f_num.lower;
-					b = (feat[rule.perm[i]].f_num.upper - feat[rule.perm[i]].f_num.lower) * x[ptr + 2] + feat[rule.perm[i]].f_num.lower;
+					a = Delta * x[ptr + 1] + feat[rule.perm[i]].f_num.lower;
+					b = Delta * x[ptr + 2] + feat[rule.perm[i]].f_num.lower;
 				}
+				// repairing
+				if((delta >= 0) && ((b-a) > delta)) {
+//					cout << "Repairing REAL: [" << a << "," << b << "] ==> ";
+					b = a + delta;
+//					cout << "[" << a << "," << b << "]." << endl;
+				} else {
+//					cout << "NO repairing REAL: [" << a << "," << b << "]." << endl;
+				}
+				// proceed
 				char str_pom[256];
 				sprintf(str_pom, "%.4f_%.4f", a, b);
 				string attr(str_pom);
 				pair.append(attr);
 				taken = true;
+//				cout << "Feature= " << pair << endl;
 			}
 		}
 		if (taken) {
@@ -140,6 +177,7 @@ void Evaluate::decode(vector<double> x, vector<Feature> feat, Rule &rule)
 			}
 		}
 	}
+//	exit(-1);
 }
 
 void Evaluate::print_vec(string str, vector<int>vec)

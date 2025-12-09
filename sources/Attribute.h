@@ -1,5 +1,5 @@
-#ifndef ATTRIBUTE_H_
-#define ATTRIBUTE_H_
+#ifndef SOURCES_ATTRIBUTE_H_
+#define SOURCES_ATTRIBUTE_H_
 
 #include <iostream>
 #include <algorithm>
@@ -41,4 +41,4 @@ public:
 	string s_val;
 };
 
-#endif /* ATTRIBUTE_H_ */
+#endif /* SOURCES_ATTRIBUTE_H_ */

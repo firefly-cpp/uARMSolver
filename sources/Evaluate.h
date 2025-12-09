@@ -1,5 +1,5 @@
-#ifndef EVALUATE_H_
-#define EVALUATE_H_
+#ifndef SOURCES_EVALUATE_H_
+#define SOURCES_EVALUATE_H_
 
 #include <vector>
 
@@ -27,9 +27,9 @@ public:
 	Evaluate();
 	~Evaluate();
 
-	double EnergyFunction(vector<double> x, Problem prob, Rule &rule);
+	double EnergyFunction(vector<double> x, Problem prob, Rule &rule, int intervals);
 	int encode(int D, Problem prob);
-	void decode(vector<double> x, vector<Feature> feat, Rule &rule);
+	void decode(vector<double> x, vector<Feature> feat, Rule &rule, int intervals);
 	void sort(vector<int>&index, vector<double>&val);
 
 	void print_vec(string str, vector<int>vec);
@@ -40,4 +40,4 @@ public:
 };
 
 
-#endif /* EVALUATE_H_ */
+#endif /* SOURCES_EVALUATE_H_ */

@@ -8,8 +8,8 @@
 #ifndef SOURCE_SQUASH_H_
 #define SOURCE_SQUASH_H_
 
-#include "Setup.h"
 #include "Problem.h"
+#include "Setup.h"
 
 
 /**

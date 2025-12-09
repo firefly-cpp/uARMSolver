@@ -1,5 +1,5 @@
-#ifndef ARCHIVE_H_
-#define ARCHIVE_H_
+#ifndef SOURCES_ARCHIVE_H_
+#define SOURCES_ARCHIVE_H_
 
 #include <stdio.h>
 #include <math.h>
@@ -52,4 +52,4 @@ public:
 
 bool compare(Rule one, Rule two);
 
-#endif /* ARCHIVE_H_ */
+#endif /* SOURCES_ARCHIVE_H_ */

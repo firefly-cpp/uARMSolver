@@ -1,5 +1,5 @@
-#ifndef SETUP_H_
-#define SETUP_H_
+#ifndef SOURCES_SETUP_H_
+#define SOURCES_SETUP_H_
 
 #include <stdio.h>
 #include <math.h>
@@ -23,8 +23,6 @@
 #define SQUASH_CAUCHY	1
 #define SQUASH_EUCLID	2
 
-#define uint unsigned int
-
 using namespace std;
 
 	// algorithm's setups
@@ -32,6 +30,12 @@ using namespace std;
 		double 	scale;
 		double	xover;
 		int strategy;
+	};
+
+	struct pso_param {
+		double 	inertia_weight;
+		double	coefficient_1;
+		double	coefficient_2;
 	};
 
 	// visualization's setups
@@ -91,6 +95,7 @@ public:
 	int get_Np() { return Np; }
 	int get_FEs() { return FEs; }
 	int get_RUNs() { return RUNs; }
+	int get_intervals() { return n_intervals; }
 	string get_tdbase_name() { return tdbase_name; }
 	string get_sq_dbase_name() { return sq_dbase_name; }
 	string get_rule_name() { return rule_name; }
@@ -103,6 +108,7 @@ public:
 	void set_Np(int val) { Np = val; }
 	void set_FEs(int val) { FEs = val; }
 	void set_RUNs(int val) { RUNs = val; }
+	void set_intervals(int val) { n_intervals = val; }
 	void set_tdbase_name(string str) { tdbase_name = str; }
 	void set_rule_name(string str) { rule_name = str; }
 	void set_out_name(string str) { out_name = str; }
@@ -115,6 +121,7 @@ private:
 	int 	Np;				///< population size
 	int		FEs;			///< number of fitness function evaluations
 	int		RUNs;			///< number of independent runs
+	int		n_intervals;	///< number of intervals
 
 	string	arm_set_name;	///< ARM setup file name
 	string 	tdbase_name;	///< transaction database
@@ -125,6 +132,7 @@ private:
 public:
 	union {
 		de_param de;
+		pso_param pso;
 	} alg_param;			///< algorithm parameters
 
 	union {
@@ -137,4 +145,4 @@ public:
 
 };
 
-#endif /* SETUP_H_ */
+#endif /* SOURCES_SETUP_H_ */

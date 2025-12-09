@@ -62,13 +62,14 @@ DESolver::~DESolver(void)
  * @param DE mutation strategy, scale factor, and crossover probability algorithm's parameters.
  * @return no return code.
  */
-void DESolver::Setup(int deStrategy, double diffScale, double crossoverProb)
+void DESolver::Setup(int deStrategy, double diffScale, double crossoverProb, int n_intervals)
 {
 	int i;
 
 	strategy	= deStrategy;
 	scale		= diffScale;
 	probability = crossoverProb;
+	intervals	= n_intervals;
 cout << "Initialisation of population..." << endl;
 	for (i=0; i < nPop; i++)
 	{
@@ -148,7 +149,7 @@ cout << "generation= " << generation << endl;
 		{
 			Rule rule;
 			(this->*calcTrialSolution)(candidate);
-			trialEnergy = eval.EnergyFunction(trialSolution, prob, rule);
+			trialEnergy = eval.EnergyFunction(trialSolution, prob, rule, intervals);
 			if (trialEnergy > popEnergy[candidate])
 			{
 				// New low for this candidate

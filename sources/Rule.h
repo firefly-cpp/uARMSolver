@@ -1,5 +1,5 @@
-#ifndef RULE_H_
-#define RULE_H_
+#ifndef SOURCES_RULE_H_
+#define SOURCES_RULE_H_
 
 #include <stdio.h>
 #include <math.h>
@@ -63,4 +63,4 @@ public:
 	vector <double> val;	///< floating-point vector, which elements determine an ordering of features in permutation
 };
 
-#endif /* RULE_H_ */
+#endif /* SOURCES_RULE_H_ */
